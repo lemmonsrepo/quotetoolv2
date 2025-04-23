@@ -61,12 +61,10 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
     g_abbr = quote_input[-1]
     plan, price, sh = get_prices(age, gender)
 
-    st.experimental_set_query_params(clear_input="true")
-
     if plan == "FE":
         copy_text = f"({age}{g_abbr})\nFE ${price}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';parent.postMessage('clear_input','*')"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);window.parent.postMessage('clear_input','*');document.getElementById('copied-msg').style.display='block';"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>FE ${price}</b>
         </div>
@@ -84,7 +82,7 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
         bundle = price + sh
         copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';parent.postMessage('clear_input','*')"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);window.parent.postMessage('clear_input','*');document.getElementById('copied-msg').style.display='block';"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>{plan}${price}</b> | <b>SH${sh}</b><br><b>BUNDLE ${bundle}</b>
         </div>
@@ -99,5 +97,5 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
         </script>
         """
 
-    components.html(html, height=200)
+    components.html(html, height=230)
     st.stop()
