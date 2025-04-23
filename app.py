@@ -20,48 +20,45 @@ def reset_state():
 
 st.markdown("""
 <style>
-    input[type="text"] {
-        opacity: 0;
-        height: 1px;
-        position: absolute;
-        top: -100px;
-    }
+input[type="text"] {
+  position: absolute;
+  left: -9999px;
+}
 </style>
 """, unsafe_allow_html=True)
 
-placeholder = st.empty()
-
-if st.button("RESET"):
-    reset_state()
-
-quote_input = placeholder.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3)
+input_box = st.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3, key="hidden_input")
+st.session_state.quote_input = input_box.upper()
 
 st.markdown("""
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.addEventListener("keydown", function(e) {
-      let input = window.parent.document.querySelector("input[data-baseweb='input']");
-      if (!input) return;
+document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("keydown", function(e) {
+    let input = window.parent.document.querySelector("input[data-baseweb='input']");
+    if (!input) return;
 
-      if (e.key === "Backspace" || e.key === "Delete") {
-        input.value = "";
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        return;
-      }
-
-      const allowedKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "M", "F"];
-      if (!allowedKeys.includes(e.key.toUpperCase())) return;
-
-      if (input.value.length >= 3) return;
-      if (input.value.length === 0 && !["1", "2", "3", "4", "5", "6", "7", "8"].includes(e.key)) return;
-      if (input.value.length === 2 && !["M", "F"].includes(e.key.toUpperCase())) return;
-
-      input.value += e.key.toUpperCase();
+    if (e.key === "Backspace" || e.key === "Delete") {
+      input.value = "";
       input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
+      return;
+    }
+
+    const allowedKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "M", "F"];
+    if (!allowedKeys.includes(e.key.toUpperCase())) return;
+
+    if (input.value.length >= 3) return;
+    if (input.value.length === 0 && !["1", "2", "3", "4", "5", "6", "7", "8"].includes(e.key)) return;
+    if (input.value.length === 2 && !["M", "F"].includes(e.key.toUpperCase())) return;
+
+    input.value += e.key.toUpperCase();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
   });
+});
 </script>
 """, unsafe_allow_html=True)
+
+if st.button("RESET"):
+    reset_state()
 
 if st.session_state.quote_input and len(st.session_state.quote_input) == 3 and st.session_state.quote_input[:2].isdigit() and st.session_state.quote_input[-1].upper() in ["M", "F"] and st.session_state.quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
     st.session_state.submitted = True
