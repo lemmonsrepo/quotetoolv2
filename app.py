@@ -27,30 +27,6 @@ input[type="text"] {
   letter-spacing: 1px;
 }
 </style>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  document.addEventListener("keydown", function(e) {
-    let input = window.parent.document.querySelector("input[data-baseweb='input']");
-    if (!input) return;
-
-    if (e.key === "Backspace" || e.key === "Delete") {
-      input.value = "";
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      return;
-    }
-
-    const allowedKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "M", "F"];
-    if (!allowedKeys.includes(e.key.toUpperCase())) return;
-
-    if (input.value.length >= 3) return;
-    if (input.value.length === 0 && !["1", "2", "3", "4", "5", "6", "7", "8"].includes(e.key)) return;
-    if (input.value.length === 2 && !["M", "F"].includes(e.key.toUpperCase())) return;
-
-    input.value += e.key.toUpperCase();
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  });
-});
-</script>
 """, unsafe_allow_html=True)
 
 quote_input = st.text_input("", label_visibility="collapsed", max_chars=3)
@@ -104,24 +80,22 @@ if st.session_state.submitted:
     g_abbr = "M" if gender == "Male" else "F"
 
     if plan == "FE":
-        copy_block = f"({age}{g_abbr})\\nFE ${price}"
+        copy_block = f"({age}{g_abbr})\nFE ${price}"
         html_block = f"""
-        <div id='copy-box' onclick="navigator.clipboard.writeText(`{copy_block}`); document.getElementById('copied-msg').style.display='block'; setTimeout(() => document.getElementById('copied-msg').style.display='none', 2000);" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+        <div style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;' onclick="navigator.clipboard.writeText(`{copy_block}`); alert('✔ Copied!')">
             ({age}{g_abbr})<br>
             <b>FE ${price}</b>
         </div>
-        <div id='copied-msg' style='display:none; color:#00ffcc; font-size:16px; margin-top:6px; text-align:center;'>✔ Copied!</div>
         """
     else:
         bundle = price + sh
-        copy_block = f"({age}{g_abbr})\\n{plan}${price} | SH${sh}\\nBUNDLE ${bundle}"
+        copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html_block = f"""
-        <div id='copy-box' onclick="navigator.clipboard.writeText(`{copy_block}`); document.getElementById('copied-msg').style.display='block'; setTimeout(() => document.getElementById('copied-msg').style.display='none', 2000);" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+        <div style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;' onclick="navigator.clipboard.writeText(`{copy_block}`); alert('✔ Copied!')">
             ({age}{g_abbr})<br>
             <b>{plan}${price}</b> | <b>SH${sh}</b><br>
             <b>BUNDLE ${bundle}</b>
         </div>
-        <div id='copied-msg' style='display:none; color:#00ffcc; font-size:16px; margin-top:6px; text-align:center;'>✔ Copied!</div>
         """
 
     st.session_state.copy_text = copy_block
