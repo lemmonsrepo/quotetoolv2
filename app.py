@@ -51,7 +51,18 @@ def get_prices(age, gender):
     else:
         return "TL", tl_prices[gender][age], sh_prices[gender][age]
 
-# Input box
+# Input box with clearing script
+st.markdown("""
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputBox = window.parent.document.querySelector("input[type=text]");
+        if(inputBox) {
+            inputBox.addEventListener("click", () => inputBox.value = "");
+        }
+    });
+    </script>
+""", unsafe_allow_html=True)
+
 quote_input = st.text_input("", max_chars=3, label_visibility="collapsed").upper()
 
 # Generate and display result
@@ -64,7 +75,7 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
     if plan == "FE":
         copy_text = f"({age}{g_abbr})\nFE ${price}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';document.getElementById('quote-input').value='';"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block'"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>FE ${price}</b>
         </div>
@@ -74,7 +85,7 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
         bundle = price + sh
         copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';document.getElementById('quote-input').value='';"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block'"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>{plan}${price}</b> | <b>SH${sh}</b><br><b>BUNDLE ${bundle}</b>
         </div>
@@ -83,11 +94,3 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
 
     components.html(html, height=200)
     st.stop()
-
-# Assign an ID to the input for JS access
-st.markdown("""
-    <script>
-    const input = window.parent.document.querySelector("input[type='text']");
-    if (input) input.id = 'quote-input';
-    </script>
-""", unsafe_allow_html=True)
