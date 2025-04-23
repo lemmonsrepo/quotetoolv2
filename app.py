@@ -8,18 +8,9 @@ st.markdown("""
     <style>
     header {visibility: hidden;}
     .stApp { padding-top: 0rem; }
-    .keypad-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        justify-items: center;
-        align-items: center;
-        margin: 0 auto;
-        max-width: 280px;
-    }
     .keypad-button {
-        width: 80px;
-        height: 80px;
+        width: 100%;
+        height: 70px;
         font-size: 24px;
         font-family: 'Myriad Pro', sans-serif;
     }
@@ -54,6 +45,14 @@ if "selected_gender" not in st.session_state:
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 
+def add_digit(d):
+    if len(st.session_state.age_input) < 2:
+        st.session_state.age_input += str(d)
+
+def select_gender(g):
+    st.session_state.selected_gender = g
+    st.session_state.submitted = True
+
 male_ia_prices = {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}}
 female_ia_prices = {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
 male_tl_prices = {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93}
@@ -70,35 +69,25 @@ elif st.session_state.selected_gender == "Female":
 st.markdown(f'<div class="input-display">{st.session_state.age_input}{suffix}</div>', unsafe_allow_html=True)
 
 if not st.session_state.submitted:
-    def add_digit(d):
-        if len(st.session_state.age_input) < 2:
-            st.session_state.age_input += str(d)
+    row1 = st.columns(3)
+    with row1[0]: st.button("1", on_click=add_digit, args=(1,), key="btn1")
+    with row1[1]: st.button("2", on_click=add_digit, args=(2,), key="btn2")
+    with row1[2]: st.button("3", on_click=add_digit, args=(3,), key="btn3")
 
-    def select_gender(g):
-        st.session_state.selected_gender = g
-        st.session_state.submitted = True
+    row2 = st.columns(3)
+    with row2[0]: st.button("4", on_click=add_digit, args=(4,), key="btn4")
+    with row2[1]: st.button("5", on_click=add_digit, args=(5,), key="btn5")
+    with row2[2]: st.button("6", on_click=add_digit, args=(6,), key="btn6")
 
-    st.markdown("<div class='keypad-container'>", unsafe_allow_html=True)
-    for digit in [1, 2, 3, 4, 5, 6, 7, 8, 9, "MALE", 0, "FEMALE"]:
-        if isinstance(digit, int):
-            disabled = False
-            if st.session_state.age_input == "9" and digit != 0:
-                disabled = True
-            if st.session_state.age_input == "8" and digit != 0:
-                disabled = True
-            if st.session_state.age_input == "1" and digit not in [8, 9]:
-                disabled = True
-            if st.session_state.age_input and int(st.session_state.age_input + str(digit)) > 80:
-                disabled = True
-            if st.button(str(digit), key=f"btn{digit}", disabled=disabled):
-                add_digit(digit)
-        elif digit == "MALE":
-            if st.button("MALE", key="male_btn"):
-                select_gender("Male")
-        elif digit == "FEMALE":
-            if st.button("FEMALE", key="female_btn"):
-                select_gender("Female")
-    st.markdown("</div>", unsafe_allow_html=True)
+    row3 = st.columns(3)
+    with row3[0]: st.button("7", on_click=add_digit, args=(7,), key="btn7")
+    with row3[1]: st.button("8", on_click=add_digit, args=(8,), key="btn8")
+    with row3[2]: st.button("9", on_click=add_digit, args=(9,), key="btn9")
+
+    row4 = st.columns(3)
+    with row4[0]: st.button("MALE", on_click=select_gender, args=("Male",), key="male_btn")
+    with row4[1]: st.button("0", on_click=add_digit, args=(0,), key="btn0")
+    with row4[2]: st.button("FEMALE", on_click=select_gender, args=("Female",), key="female_btn")
 
 if st.button("RESET"):
     st.session_state.age_input = ""
