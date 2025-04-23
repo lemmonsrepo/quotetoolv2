@@ -8,10 +8,39 @@ st.markdown("""
     <style>
     header {visibility: hidden;}
     .stApp { padding-top: 0rem; }
-    .keypad-row { display: flex; justify-content: center; margin-bottom: 10px; }
-    .key-button { width: 70px; height: 70px; font-size: 24px; margin: 5px; font-family: 'Myriad Pro', sans-serif; }
-    .input-display { font-family: 'Myriad Pro', sans-serif; text-transform: uppercase; font-weight: bold; font-size: 32px; text-align: center; margin: 20px auto; border: 1px solid #ccc; padding: 10px; width: 220px; }
-    .results { font-family: 'Myriad Pro', sans-serif; text-transform: uppercase; font-weight: bold; font-size: 22px; text-align: center; margin-top: 20px; }
+    .keypad-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        justify-items: center;
+        margin: 0 auto;
+        max-width: 300px;
+    }
+    .key-button {
+        width: 80px;
+        height: 80px;
+        font-size: 24px;
+        font-family: 'Myriad Pro', sans-serif;
+    }
+    .input-display {
+        font-family: 'Myriad Pro', sans-serif;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 32px;
+        text-align: center;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: 220px;
+    }
+    .results {
+        font-family: 'Myriad Pro', sans-serif;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 22px;
+        text-align: center;
+        margin-top: 20px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -26,7 +55,7 @@ if "selected_gender" not in st.session_state:
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 
-# Pricing data
+# Pricing data (same as before, unchanged)
 male_ia_prices = {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}}
 female_ia_prices = {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
 male_tl_prices = {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93}
@@ -53,28 +82,27 @@ if not st.session_state.submitted:
         st.session_state.selected_gender = g
         st.session_state.submitted = True
 
-    rows = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    for row in rows:
-        cols = st.columns(3)
-        for i, digit in enumerate(row):
-            disabled = False
-            if st.session_state.age_input == "9" and digit != 0:
-                disabled = True
-            if st.session_state.age_input == "8" and digit != 0:
-                disabled = True
-            if st.session_state.age_input == "1" and digit not in [8, 9]:
-                disabled = True
-            if st.session_state.age_input and int(st.session_state.age_input + str(digit)) > 80:
-                disabled = True
-            if cols[i].button(str(digit), key=f"btn{digit}", disabled=disabled):
-                add_digit(digit)
+    st.markdown("<div class='keypad-grid'>", unsafe_allow_html=True)
+    for digit in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
+        disabled = False
+        if st.session_state.age_input == "9" and digit != 0:
+            disabled = True
+        if st.session_state.age_input == "8" and digit != 0:
+            disabled = True
+        if st.session_state.age_input == "1" and digit not in [8, 9]:
+            disabled = True
+        if st.session_state.age_input and int(st.session_state.age_input + str(digit)) > 80:
+            disabled = True
+        if st.button(str(digit), key=f"btn{digit}", disabled=disabled):
+            add_digit(digit)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    colM, col0, colF = st.columns(3)
-    if colM.button("MALE", key="male_btn"):
+    colM, col0, colF = st.columns([1, 1, 1])
+    if colM.button("MALE"):
         select_gender("Male")
-    if col0.button("0", key="btn0"):
+    if col0.button("0"):
         add_digit(0)
-    if colF.button("FEMALE", key="female_btn"):
+    if colF.button("FEMALE"):
         select_gender("Female")
 
 # Reset button
