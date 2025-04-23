@@ -58,7 +58,10 @@ if not st.session_state.submitted:
                 cols[i].button(label, on_click=add_digit, args=(label,), disabled=disable, key=f"btn_{label}")
 
 def get_prices(age, gender):
-    ia_prices = {"Male": 21, "Female": 20}
+    ia_prices = {
+        "Male": {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}},
+        "Female": {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
+    }
     tl_prices = {
         "Male": {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93},
         "Female": {46: 25, 47: 25, 48: 26, 49: 27, 50: 27, 51: 29, 52: 30, 53: 32, 54: 34, 55: 35, 56: 38, 57: 40, 58: 43, 59: 46, 60: 49, 61: 54, 62: 58, 63: 62, 64: 67},
@@ -75,7 +78,8 @@ def get_prices(age, gender):
     if age >= 65:
         return "FE", fe_prices[gender][age], 0
     elif age <= 45:
-        return "IA", ia_prices[gender], sh_prices[gender][age]
+        price = ia_prices[gender][age]
+        return "IA", price, sh_prices[gender][age]
     else:
         return "TL", tl_prices[gender][age], sh_prices[gender][age]
 
