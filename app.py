@@ -12,24 +12,60 @@ if "copy_text" not in st.session_state:
 if "copied" not in st.session_state:
     st.session_state.copied = False
 
-
 def reset_state():
     st.session_state.quote_input = ""
     st.session_state.submitted = False
     st.session_state.copy_text = ""
     st.session_state.copied = False
 
-# This will force results to update immediately when the input changes
-input_value = st.text_input("Enter Age + Gender (e.g. 26F)", max_chars=3)
-if input_value != st.session_state.quote_input:
-    st.session_state.quote_input = input_value.upper()
-    st.experimental_rerun()
+# Use a live updating input with JS to instantly trigger submission on full entry
+st.markdown("""
+<style>
+input[type="text"] {
+  font-size: 24px;
+  text-align: center;
+  font-family: Myriad Pro;
+  letter-spacing: 1px;
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("keydown", function(e) {
+    let input = window.parent.document.querySelector("input[data-baseweb='input']");
+    if (!input) return;
+
+    if (e.key === "Backspace" || e.key === "Delete") {
+      input.value = "";
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
+
+    const allowedKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "M", "F"];
+    if (!allowedKeys.includes(e.key.toUpperCase())) return;
+
+    if (input.value.length >= 3) return;
+    if (input.value.length === 0 && !["1", "2", "3", "4", "5", "6", "7", "8"].includes(e.key)) return;
+    if (input.value.length === 2 && !["M", "F"].includes(e.key.toUpperCase())) return;
+
+    input.value += e.key.toUpperCase();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+});
+</script>
+""", unsafe_allow_html=True)
+
+quote_input = st.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3)
+
+if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1].upper() in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+    st.session_state.quote_input = quote_input.upper()
+    st.session_state.submitted = True
+else:
+    st.session_state.submitted = False
 
 if st.button("RESET"):
     reset_state()
 
-if st.session_state.quote_input and len(st.session_state.quote_input) == 3 and st.session_state.quote_input[:2].isdigit() and st.session_state.quote_input[-1].upper() in ["M", "F"] and st.session_state.quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-    st.session_state.submitted = True
+if st.session_state.submitted:
     age = int(st.session_state.quote_input[:2])
     gender = "Male" if st.session_state.quote_input[-1].upper() == "M" else "Female"
 
