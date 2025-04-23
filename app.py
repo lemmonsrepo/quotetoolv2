@@ -124,12 +124,13 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
 
     st.session_state.copy_text = output
 
+    # Modified HTML for copy box with proper formatting and bold keywords only
     html_block = f"""
         <style>
             .copy-box {{
                 cursor: pointer;
                 font-family: Myriad Pro;
-                font-weight: bold;
+                font-weight: 400;
                 font-size: 22px;
                 text-align: center;
                 color: white;
@@ -138,6 +139,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
                 border-radius: 8px;
                 background-color: #222;
                 margin-top: 20px;
+                line-height: 1.6;
             }}
             .copied-popup {{
                 position: fixed;
@@ -154,8 +156,8 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
             }}
             @keyframes fadeout {{ from {{ opacity: 1; }} to {{ opacity: 0; }} }}
         </style>
-        <div class="copy-box" onclick="navigator.clipboard.writeText(`{output.replace('\n', ' ')}`); var popup=document.createElement('div'); popup.className='copied-popup'; popup.innerText='Copied!'; document.body.appendChild(popup); setTimeout(function(){{popup.remove()}}, 2000);">
-            {output.replace('\n', '<br>')}
+        <div class="copy-box" onclick="navigator.clipboard.writeText(`{output}`); var popup=document.createElement('div'); popup.className='copied-popup'; popup.innerText='Copied!'; document.body.appendChild(popup); setTimeout(function(){{popup.remove()}}, 2000);">
+            {output.replace("IA$", "<b>IA$").replace("TL$", "<b>TL$").replace("SH$", "<b>SH$").replace("BUNDLE $", "<b>BUNDLE $").replace("\n", "</b><br>")}
         </div>
     """
     components.html(html_block, height=180)
