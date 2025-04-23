@@ -95,15 +95,16 @@ if not st.session_state.submitted:
             disabled = True
         if st.button(str(digit), key=f"btn{digit}", disabled=disabled):
             add_digit(digit)
-    st.markdown("</div>", unsafe_allow_html=True)
 
-    colM, col0, colF = st.columns([1, 1, 1])
-    if colM.button("MALE"):
+    # Last row: male, 0, female
+    col_male, col_zero, col_female = st.columns([1, 1, 1])
+    if col_male.button("MALE"):
         select_gender("Male")
-    if col0.button("0"):
+    if col_zero.button("0"):
         add_digit(0)
-    if colF.button("FEMALE"):
+    if col_female.button("FEMALE"):
         select_gender("Female")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Reset button
 if st.button("RESET"):
