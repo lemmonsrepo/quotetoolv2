@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="", layout="centered")
 
@@ -16,15 +17,43 @@ def reset_state():
     st.session_state.submitted = False
     st.session_state.copy_text = ""
 
-quote_input = st.text_input("", key="quote_input", label_visibility="collapsed", max_chars=3)
+placeholder = st.empty()
 
 if st.button("RESET"):
     reset_state()
 
-if quote_input and len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1].upper() in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+quote_input = placeholder.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3, disabled=True)
+st.markdown("""
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function(e) {
+      let input = window.parent.document.querySelector("input[data-baseweb='input']");
+      if (!input) return;
+
+      if (e.key === "Backspace" || e.key === "Delete") {
+        input.value = "";
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        return;
+      }
+
+      const allowedKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "M", "F"];
+      if (!allowedKeys.includes(e.key.toUpperCase())) return;
+
+      if (input.value.length >= 3) return;
+      if (input.value.length === 0 && !["1", "2", "3", "4", "5", "6", "7", "8"].includes(e.key)) return;
+      if (input.value.length === 2 && !["M", "F"].includes(e.key.toUpperCase())) return;
+
+      input.value += e.key.toUpperCase();
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+</script>
+""", unsafe_allow_html=True)
+
+if st.session_state.quote_input and len(st.session_state.quote_input) == 3 and st.session_state.quote_input[:2].isdigit() and st.session_state.quote_input[-1].upper() in ["M", "F"] and st.session_state.quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
     st.session_state.submitted = True
-    age = int(quote_input[:2])
-    gender = "Male" if quote_input[-1].upper() == "M" else "Female"
+    age = int(st.session_state.quote_input[:2])
+    gender = "Male" if st.session_state.quote_input[-1].upper() == "M" else "Female"
 
     def get_prices(age, gender):
         ia_prices = {
@@ -63,7 +92,8 @@ if quote_input and len(quote_input) == 3 and quote_input[:2].isdigit() and quote
     if plan == "FE":
         copy_block = f"({age}{g_abbr})\nFE ${price}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`); this.innerHTML += '<br><span style=\"color: #00ffcc; font-size: 14px;\">Copied!</span>';" 
+             style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>FE ${price}</b>
         </div>
@@ -72,7 +102,8 @@ if quote_input and len(quote_input) == 3 and quote_input[:2].isdigit() and quote
         bundle = price + sh
         copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`); this.innerHTML += '<br><span style=\"color: #00ffcc; font-size: 14px;\">Copied!</span>';" 
+             style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>{plan}${price}</b> | <b>SH${sh}</b><br>
             <b>BUNDLE ${bundle}</b>
