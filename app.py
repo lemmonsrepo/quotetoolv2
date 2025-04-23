@@ -12,6 +12,12 @@ if "submitted" not in st.session_state:
 if "copy_text" not in st.session_state:
     st.session_state.copy_text = ""
 
+def reset_state():
+    st.session_state.age_input = ""
+    st.session_state.selected_gender = None
+    st.session_state.submitted = False
+    st.session_state.copy_text = ""
+
 suffix = ""
 if st.session_state.selected_gender == "Male":
     suffix = "M"
@@ -20,12 +26,8 @@ elif st.session_state.selected_gender == "Female":
 
 st.markdown(f'<div style="font-family: Myriad Pro; font-weight: bold; font-size: 32px; color: white; text-align: center; border: 1px solid #ccc; padding: 10px; width: 220px; margin: 20px auto;">{st.session_state.age_input + (" " + suffix if suffix else "")}</div>', unsafe_allow_html=True)
 
-reset_keys = st.experimental_get_query_params().get("reset")
-if st.button("RESET") or reset_keys:
-    st.session_state.age_input = ""
-    st.session_state.selected_gender = None
-    st.session_state.submitted = False
-    st.session_state.copy_text = ""
+if st.button("RESET"):
+    reset_state()
 
 def add_digit(d):
     if len(st.session_state.age_input) < 2:
@@ -58,14 +60,10 @@ if not st.session_state.submitted:
                     disable = True
                 cols[i].button(label, on_click=add_digit, args=(label,), disabled=disable, key=f"btn_{label}")
 
-    # Numeric key support
     key = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
     if key:
         if key in ["Backspace", "Delete"]:
-            st.session_state.age_input = ""
-            st.session_state.selected_gender = None
-            st.session_state.submitted = False
-            st.session_state.copy_text = ""
+            reset_state()
         elif key.isdigit() and len(key) <= 2 and 18 <= int(key) <= 80:
             st.session_state.age_input = key
 
