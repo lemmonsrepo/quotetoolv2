@@ -61,19 +61,21 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
     g_abbr = quote_input[-1]
     plan, price, sh = get_prices(age, gender)
 
+    st.experimental_set_query_params(clear_input="true")
+
     if plan == "FE":
         copy_text = f"({age}{g_abbr})\nFE ${price}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';window.parent.postMessage({{type: 'CLEAR_INPUT'}}, '*');"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';parent.postMessage('clear_input','*')"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>FE ${price}</b>
         </div>
         <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
         <script>
             window.addEventListener("message", function(event) {
-                if (event.data.type === "CLEAR_INPUT") {
-                    const inputs = window.parent.document.querySelectorAll("input[type=text]");
-                    if(inputs.length) inputs[0].value = "";
+                if (event.data === "clear_input") {
+                    const input = window.parent.document.querySelector("input[type=text]");
+                    if(input) input.value = "";
                 }
             });
         </script>
@@ -82,16 +84,16 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
         bundle = price + sh
         copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';window.parent.postMessage({{type: 'CLEAR_INPUT'}}, '*');"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';parent.postMessage('clear_input','*')"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>{plan}${price}</b> | <b>SH${sh}</b><br><b>BUNDLE ${bundle}</b>
         </div>
         <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
         <script>
             window.addEventListener("message", function(event) {
-                if (event.data.type === "CLEAR_INPUT") {
-                    const inputs = window.parent.document.querySelectorAll("input[type=text]");
-                    if(inputs.length) inputs[0].value = "";
+                if (event.data === "clear_input") {
+                    const input = window.parent.document.querySelector("input[type=text]");
+                    if(input) input.value = "";
                 }
             });
         </script>
