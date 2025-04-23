@@ -3,6 +3,22 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="", layout="centered")
 
+# Fix layout padding to ensure visibility
+st.markdown("""
+    <style>
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    input[type="text"] {
+        text-align: center;
+        font-size: 24px;
+        font-family: Myriad Pro;
+        letter-spacing: 2px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Pricing data
 def get_prices(age, gender):
     ia_prices = {
@@ -39,7 +55,7 @@ def get_prices(age, gender):
     else:
         return "TL", tl_prices[gender][age], sh_prices[gender][age]
 
-# Input field
+# Input box
 quote_input = st.text_input("", max_chars=3, label_visibility="collapsed", key="quote_input").upper()
 
 # Reset button
@@ -47,32 +63,31 @@ if st.button("RESET"):
     st.session_state["quote_input"] = ""
     st.experimental_rerun()
 
-# Auto-display on valid entry
+# Result display
 if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["M", "F"]:
     age = int(quote_input[:2])
     gender = "Male" if quote_input[-1] == "M" else "Female"
     g_abbr = quote_input[-1]
-
     plan, price, sh = get_prices(age, gender)
 
     if plan == "FE":
         copy_text = f"({age}{g_abbr})\nFE ${price}"
         html = f"""
         <div onclick=\"navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block'\"
-             style='cursor:pointer;font-family:sans-serif;text-align:center;background:#2c2c2c;padding:10px;border-radius:10px;font-size:22px;color:white;'>
+             style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:2rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>FE ${price}</b>
         </div>
-        <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;'>✔ Copied!</div>
+        <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
         """
     else:
         bundle = price + sh
         copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html = f"""
         <div onclick=\"navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block'\"
-             style='cursor:pointer;font-family:sans-serif;text-align:center;background:#2c2c2c;padding:10px;border-radius:10px;font-size:22px;color:white;'>
+             style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:2rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>{plan}${price}</b> | <b>SH${sh}</b><br><b>BUNDLE ${bundle}</b>
         </div>
-        <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;'>✔ Copied!</div>
+        <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
         """
 
     st.session_state["quote_input"] = ""
