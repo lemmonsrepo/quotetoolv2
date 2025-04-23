@@ -87,21 +87,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         bundle = price + sh
         st.session_state.copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
 
-    st.markdown(f"""
-        <style>
-        .copy-box {{
-            cursor: pointer;
-            font-family: Myriad Pro;
-            font-weight: bold;
-            font-size: 22px;
-            text-align: center;
-            color: white;
-            padding: 15px;
-            border: 1px solid #555;
-            border-radius: 8px;
-            background-color: #222;
-            margin-top: 20px;
-        }}
+    {"<br>".join(st.session_state.copy_text.splitlines()) if st.session_state.copy_text else ""}
         .copied-popup {{
             position: fixed;
             top: 20px;
