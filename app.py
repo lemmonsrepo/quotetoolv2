@@ -63,7 +63,7 @@ if not st.session_state.submitted:
 # Keyboard input handling
 key_input = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
 if key_input == "" and st.session_state.submitted is False:
-    key_input = st.experimental_get_query_params().get("keyboard_input", [""])[0]
+    key_input = st.query_params.get("keyboard_input", [""])[0]
 if key_input in ["\b", "\x7f"]:
     reset_state()
 elif key_input.isdigit():
@@ -119,6 +119,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
     plan, price, sh = get_prices(age, gender)
 
     if plan == "FE":
+        copy_block = f"({age}{g_abbr})\nFE ${price}"
         html_block = f"""
         <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
             ({age}{g_abbr})<br>
@@ -127,6 +128,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         """
     else:
         bundle = price + sh
+        copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html_block = f"""
         <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
             ({age}{g_abbr})<br>
@@ -134,4 +136,6 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
             <b>BUNDLE ${bundle}</b>
         </div>
         """
+    st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
+    st.text_input("", value=copy_block, label_visibility="collapsed")
