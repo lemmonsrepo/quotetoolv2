@@ -13,7 +13,7 @@ if "copied" not in st.session_state:
     st.session_state.copied = False
 
 def reset_state():
-    st.session_state.quote_input = ""
+    st.session_state["quote_input_box"] = ""
     st.session_state.submitted = False
     st.session_state.copy_text = ""
     st.session_state.copied = False
