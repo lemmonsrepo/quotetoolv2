@@ -54,7 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 """, unsafe_allow_html=True)
 
-quote_input = st.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3)
+quote_input = st.text_input("", label_visibility="collapsed", max_chars=3).upper()
+    st.session_state.quote_input = quote_input
+    if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+        st.session_state.submitted = True
+    else:
+        st.session_state.submitted = False
 
 if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1].upper() in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
     st.session_state.quote_input = quote_input.upper()
