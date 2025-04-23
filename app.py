@@ -121,7 +121,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
     if plan == "FE":
         copy_block = f"({age}{g_abbr})\nFE ${price}"
         html_block = f"""
-        <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>FE ${price}</b>
         </div>
@@ -130,7 +130,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         bundle = price + sh
         copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html_block = f"""
-        <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>{plan}${price}</b> | <b>SH${sh}</b><br>
             <b>BUNDLE ${bundle}</b>
@@ -138,4 +138,3 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         """
     st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
-    st.text_area("", value=copy_block, label_visibility="collapsed")
