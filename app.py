@@ -16,6 +16,16 @@ if "selected_gender" not in st.session_state:
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 
+# Handle input via query params (from JS via URL params)
+query_params = st.experimental_get_query_params()
+if "input" in query_params:
+    val = query_params["input"][0]
+    if val in ["M", "F"]:
+        st.session_state.selected_gender = "Male" if val == "M" else "Female"
+        st.session_state.submitted = True
+    elif val.isdigit() and len(st.session_state.age_input) < 2:
+        st.session_state.age_input += val
+
 # Input display
 suffix = ""
 if st.session_state.selected_gender == "Male":
@@ -27,26 +37,23 @@ st.markdown(f'<div style="font-family: Myriad Pro; font-weight: bold; font-size:
 if not st.session_state.submitted:
     components.html("""
     <div style="display: grid; grid-template-columns: repeat(3, 80px); gap: 12px; justify-content: center;">
-      <button class="key" onclick="send(1)">1</button>
-      <button class="key" onclick="send(2)">2</button>
-      <button class="key" onclick="send(3)">3</button>
-      <button class="key" onclick="send(4)">4</button>
-      <button class="key" onclick="send(5)">5</button>
-      <button class="key" onclick="send(6)">6</button>
-      <button class="key" onclick="send(7)">7</button>
-      <button class="key" onclick="send(8)">8</button>
-      <button class="key" onclick="send(9)">9</button>
-      <button class="key" style="background-color: #007bff; color: white;" onclick="send('M')">M</button>
-      <button class="key" onclick="send(0)">0</button>
-      <button class="key" style="background-color: #e91e63; color: white;" onclick="send('F')">F</button>
+      <button class="key" onclick="send('1')">1</button>
+      <button class="key" onclick="send('2')">2</button>
+      <button class="key" onclick="send('3')">3</button>
+      <button class="key" onclick="send('4')">4</button>
+      <button class="key" onclick="send('5')">5</button>
+      <button class="key" onclick="send('6')">6</button>
+      <button class="key" onclick="send('7')">7</button>
+      <button class="key" onclick="send('8')">8</button>
+      <button class="key" onclick="send('9')">9</button>
+      <button class="key male" onclick="send('M')">M</button>
+      <button class="key" onclick="send('0')">0</button>
+      <button class="key female" onclick="send('F')">F</button>
     </div>
     <script>
-      const streamlitSend = (v) => {
-        const el = window.parent.document.querySelector('iframe');
-        el.contentWindow.postMessage({ isStreamlitMessage: true, type: 'streamlit:setComponentValue', value: v }, '*');
-      }
       function send(val) {
-        streamlitSend(val);
+        const currentUrl = window.location.href.split("?")[0];
+        window.location.href = `${currentUrl}?input=${val}`;
       }
     </script>
     <style>
@@ -63,15 +70,21 @@ if not st.session_state.submitted:
         transition: background-color 0.2s;
       }
       .key:hover {
-        background-color: #555;
+        background-color: #444;
       }
       .key:active {
-        background-color: #888;
+        background-color: #666;
+      }
+      .male {
+        background-color: #007bff;
+      }
+      .female {
+        background-color: #e91e63;
       }
     </style>
-    """, height=400)
+    """, height=430)
 
-# Pricing logic
+# Pricing logic (unchanged)
 male_ia_prices = {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}}
 female_ia_prices = {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
 male_tl_prices = {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93}
