@@ -16,32 +16,14 @@ def reset_state():
     st.session_state.submitted = False
     st.session_state.copy_text = ""
 
-st.markdown("""
-    <style>
-    .input-container input {
-        text-align: center;
-        font-size: 26px;
-        font-family: Myriad Pro;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-st.title("")
-
-st.markdown("""<div style='text-align: center;'>
-<form action="" method="post">
-    <input class="input-container" name="quote_input" placeholder="Enter age and gender (e.g., 26F)" maxlength="3" style="width: 250px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" oninput="this.value = this.value.toUpperCase()">
-</form>
-</div>""", unsafe_allow_html=True)
-
-quote_input = st.text_input("", key="quote_input")
+quote_input = st.text_input("", key="quote_input", label_visibility="collapsed", max_chars=3)
 
 if st.button("RESET"):
     reset_state()
 
-if quote_input and len(quote_input) in [2, 3] and quote_input[:-1].isdigit() and quote_input[-1].upper() in ["M", "F"]:
+if quote_input and len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1].upper() in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
     st.session_state.submitted = True
-    age = int(quote_input[:-1])
+    age = int(quote_input[:2])
     gender = "Male" if quote_input[-1].upper() == "M" else "Female"
 
     def get_prices(age, gender):
