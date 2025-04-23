@@ -21,9 +21,7 @@ elif st.session_state.selected_gender == "Female":
 st.markdown(f'<div style="font-family: Myriad Pro; font-weight: bold; font-size: 32px; color: white; text-align: center; border: 1px solid #ccc; padding: 10px; width: 220px; margin: 20px auto;">{st.session_state.age_input + (" " + suffix if suffix else "")}</div>', unsafe_allow_html=True)
 
 if st.button("RESET"):
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-    st.experimental_rerun()
+    st.session_state.clear()
 
 def add_digit(d):
     if len(st.session_state.age_input) < 2:
