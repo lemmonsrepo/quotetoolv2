@@ -1,5 +1,6 @@
 import streamlit as st
 import platform
+import pyperclip
 
 st.set_page_config(page_title="", layout="centered")
 
@@ -9,21 +10,23 @@ if "selected_gender" not in st.session_state:
     st.session_state.selected_gender = None
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
+if "copy_text" not in st.session_state:
+    st.session_state.copy_text = ""
 
+# Reset logic
 if st.button("RESET"):
-    st.session_state.age_input = ""
-    st.session_state.selected_gender = None
-    st.session_state.submitted = False
+    st.session_state.clear()
+    st.experimental_rerun()
 
 suffix = ""
 if st.session_state.selected_gender == "Male":
-    suffix = " M"
+    suffix = "M"
 elif st.session_state.selected_gender == "Female":
-    suffix = " F"
+    suffix = "F"
 
-st.markdown(f'<div style="font-family: Myriad Pro; font-weight: bold; font-size: 32px; color: white; text-align: center; border: 1px solid #ccc; padding: 10px; width: 220px; margin: 20px auto;">{st.session_state.age_input}{suffix}</div>', unsafe_allow_html=True)
+st.markdown(f'<div style="font-family: Myriad Pro; font-weight: bold; font-size: 32px; color: white; text-align: center; border: 1px solid #ccc; padding: 10px; width: 220px; margin: 20px auto;">{st.session_state.age_input}{" " + suffix if suffix else ""}</div>', unsafe_allow_html=True)
 
-# Pricing dictionaries
+# Pricing dictionaries (same as before)
 male_ia_prices = {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}}
 female_ia_prices = {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
 male_tl_prices = {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93}
@@ -35,13 +38,15 @@ final_expense_prices = {age: {"Male": m, "Female": f} for age, m, f in [(65, 80,
 if not st.session_state.submitted:
     def add_digit(d):
         if len(st.session_state.age_input) < 2:
+            if d == "9" and len(st.session_state.age_input) == 0:
+                return
             st.session_state.age_input += d
 
-    def disable_key(key):
-        st.button(key, disabled=True)
+    def submit(gender):
+        st.session_state.selected_gender = gender
+        st.session_state.submitted = True
 
     rows = [["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]
-
     for row in rows:
         cols = st.columns(3)
         for i, key in enumerate(row):
@@ -52,27 +57,29 @@ if not st.session_state.submitted:
                 disable = True
             if st.session_state.age_input and len(st.session_state.age_input) == 1 and int(st.session_state.age_input + key) > 80:
                 disable = True
+            if st.session_state.age_input == "" and key == "9":
+                disable = True
             with cols[i]:
                 st.button(key, on_click=add_digit, args=(key,), disabled=disable, key=f"btn{key}")
 
     cols = st.columns(3)
     with cols[0]:
-        st.button("MALE", on_click=lambda: submit("Male"), disabled=len(st.session_state.age_input) != 2, key="male")
+        st.button("MALE", on_click=submit, args=("Male",), disabled=len(st.session_state.age_input) != 2, key="male_btn")
     with cols[1]:
         st.button("0", on_click=add_digit, args=("0",), disabled=st.session_state.age_input not in ["8"], key="btn0")
     with cols[2]:
-        st.button("FEMALE", on_click=lambda: submit("Female"), disabled=len(st.session_state.age_input) != 2, key="female")
-
-def submit(gender):
-    st.session_state.selected_gender = gender
-    st.session_state.submitted = True
+        st.button("FEMALE", on_click=submit, args=("Female",), disabled=len(st.session_state.age_input) != 2, key="female_btn")
 
 if st.session_state.submitted and st.session_state.age_input.isdigit():
     age = int(st.session_state.age_input)
     gender = st.session_state.selected_gender
+    result = ""
+    st.markdown(f"<div class='results' style='font-family: Myriad Pro; font-weight: bold; font-size: 22px; text-align: center;'>(" + str(age) + gender[0] + ")</div>", unsafe_allow_html=True)
     if age >= 65:
         fe_price = final_expense_prices[age][gender]
-        st.markdown(f"<div class='results'>FE${fe_price}</div>", unsafe_allow_html=True)
+        result = f"FE ${fe_price}"
+        st.session_state.copy_text = f"({age}{gender[0]})\nFE ${fe_price}"
+        st.markdown(f"<div class='results' style='font-weight: bold;'>FE ${fe_price}</div>", unsafe_allow_html=True)
     else:
         if age <= 45:
             plan = "IA"
@@ -82,6 +89,10 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
             price = male_tl_prices[age] if gender == "Male" else female_tl_prices[age]
         sh = male_sh_prices[age] if gender == "Male" else female_sh_prices[age]
         bundle = price + sh
-        st.markdown(f"<div class='results'>{plan}${price}</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='results'>SH${sh}</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='results'>BUNDLE${bundle}</div>", unsafe_allow_html=True)
+        line1 = f"{plan}${price} | SH${sh}"
+        line2 = f"BUNDLE ${bundle}"
+        st.session_state.copy_text = f"({age}{gender[0]})\n{line1}\n{line2}"
+        st.markdown(f"<div class='results' style='font-weight: bold;'>{line1}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='results' style='font-weight: bold;'>{line2}</div>", unsafe_allow_html=True)
+
+    st.button("COPY", on_click=lambda: pyperclip.copy(st.session_state.copy_text))
