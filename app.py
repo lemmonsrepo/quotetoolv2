@@ -62,7 +62,9 @@ if not st.session_state.submitted:
 
 # Keyboard input handling
 key_input = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
-if key_input in ["Backspace", "Delete"]:
+if key_input == "" and st.session_state.submitted is False:
+    key_input = st.experimental_get_query_params().get("keyboard_input", [""])[0]
+if key_input in ["\b", "\x7f"]:
     reset_state()
 elif key_input.isdigit():
     for digit in key_input:
@@ -120,7 +122,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         html_block = f"""
         <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
             ({age}{g_abbr})<br>
-            <span style='font-weight:bold;'>FE ${price}</span>
+            <b>FE ${price}</b>
         </div>
         """
     else:
@@ -128,8 +130,8 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         html_block = f"""
         <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
             ({age}{g_abbr})<br>
-            <span style='font-weight:bold;'>{plan}${price}</span> | <span style='font-weight:bold;'>SH${sh}</span><br>
-            <span style='font-weight:bold;'>BUNDLE ${bundle}</span>
+            <b>{plan}${price}</b> | <b>SH${sh}</b><br>
+            <b>BUNDLE ${bundle}</b>
         </div>
         """
     st.markdown(html_block, unsafe_allow_html=True)
