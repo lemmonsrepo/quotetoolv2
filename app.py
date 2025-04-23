@@ -3,20 +3,15 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="", layout="centered")
 
+# Initialize session state
 if "quote_input" not in st.session_state:
-    st.session_state["quote_input_box"] = ""
-if "submitted" not in st.session_state:
-    st.session_state.submitted = False
-if "copy_text" not in st.session_state:
-    st.session_state.copy_text = ""
+    st.session_state["quote_input"] = ""
 if "copied" not in st.session_state:
-    st.session_state.copied = False
+    st.session_state["copied"] = False
 
 def reset_state():
-    st.session_state["quote_input_box"] = ""
-    st.session_state.submitted = False
-    st.session_state.copy_text = ""
-    st.session_state.copied = False
+    st.session_state["quote_input"] = ""
+    st.session_state["copied"] = False
 
 st.markdown("""
 <style>
@@ -25,25 +20,24 @@ input[type="text"] {
   text-align: center;
   font-family: Myriad Pro;
   letter-spacing: 1px;
+  color: white;
 }
 </style>
 """, unsafe_allow_html=True)
 
-quote_input = st.text_input("", label_visibility="collapsed", max_chars=3, key="quote_input_box")
-quote_input = quote_input.upper()
-if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-    st.session_state.quote_input = quote_input
-    st.session_state.submitted = True
-else:
-    st.session_state.submitted = False
-    st.session_state.quote_input = quote_input
+input_box = st.text_input("", label_visibility="collapsed", max_chars=3, key="quote_input")
+input_box = input_box.upper()
+st.session_state.quote_input = input_box
 
+# Reset button
 if st.button("RESET"):
     reset_state()
 
-if st.session_state.submitted:
-    age = int(st.session_state.quote_input[:2])
-    gender = "Male" if st.session_state.quote_input[-1] == "M" else "Female"
+# Determine if valid input and parse
+if len(input_box) == 3 and input_box[:2].isdigit() and input_box[-1] in ["M", "F"] and input_box[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+    age = int(input_box[:2])
+    gender = "Male" if input_box[-1] == "M" else "Female"
+    g_abbr = input_box[-1]
 
     def get_prices(age, gender):
         ia_prices = {
@@ -77,7 +71,6 @@ if st.session_state.submitted:
             return "TL", tl_prices[gender][age], sh_prices[gender][age]
 
     plan, price, sh = get_prices(age, gender)
-    g_abbr = "M" if gender == "Male" else "F"
 
     if plan == "FE":
         copy_block = f"({age}{g_abbr})\nFE ${price}"
@@ -98,6 +91,5 @@ if st.session_state.submitted:
         </div>
         """
 
-    st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
     st.session_state.quote_input = ""
