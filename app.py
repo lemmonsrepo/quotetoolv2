@@ -130,4 +130,3 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         st.markdown(f"<div class='results'>{plan}${tl_price}</div>", unsafe_allow_html=True)
         st.markdown(f"<div class='results'>SH${sh_price}</div>", unsafe_allow_html=True)
         st.markdown(f"<div class='results'>BUNDLE${bundle}</div>", unsafe_allow_html=True)
-
