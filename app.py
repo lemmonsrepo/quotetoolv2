@@ -18,18 +18,11 @@ def reset_state():
     st.session_state.copy_text = ""
     st.session_state.copied = False
 
-st.markdown("""
-<style>
-input[type="text"] {
-  position: absolute;
-  left: -9999px;
-}
-</style>
-""", unsafe_allow_html=True)
+# Show the visible input field again
+input_value = st.text_input("Enter Age + Gender (e.g. 26F)", value=st.session_state.quote_input, max_chars=3)
+st.session_state.quote_input = input_value.upper()
 
-input_box = st.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3, key="hidden_input")
-st.session_state.quote_input = input_box.upper()
-
+# JS typing assist (optional)
 st.markdown("""
 <script>
 document.addEventListener("DOMContentLoaded", function () {
