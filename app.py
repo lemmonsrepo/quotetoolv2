@@ -104,47 +104,26 @@ if st.session_state.submitted:
     g_abbr = "M" if gender == "Male" else "F"
 
     if plan == "FE":
-        copy_block = f"({age}{g_abbr})\n<b>FE ${price}</b>"
+        copy_block = f"({age}{g_abbr})\\nFE ${price}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`); window.parent.postMessage('copied', '*');"
-             style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+        <div id='copy-box' onclick="navigator.clipboard.writeText(`{copy_block}`); document.getElementById('copied-msg').style.display='block'; setTimeout(() => document.getElementById('copied-msg').style.display='none', 2000);" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>FE ${price}</b>
         </div>
+        <div id='copied-msg' style='display:none; color:#00ffcc; font-size:16px; margin-top:6px; text-align:center;'>✔ Copied!</div>
         """
     else:
         bundle = price + sh
-        copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
+        copy_block = f"({age}{g_abbr})\\n{plan}${price} | SH${sh}\\nBUNDLE ${bundle}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`); window.parent.postMessage('copied', '*');"
-             style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+        <div id='copy-box' onclick="navigator.clipboard.writeText(`{copy_block}`); document.getElementById('copied-msg').style.display='block'; setTimeout(() => document.getElementById('copied-msg').style.display='none', 2000);" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>{plan}${price}</b> | <b>SH${sh}</b><br>
             <b>BUNDLE ${bundle}</b>
         </div>
+        <div id='copied-msg' style='display:none; color:#00ffcc; font-size:16px; margin-top:6px; text-align:center;'>✔ Copied!</div>
         """
 
     st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
-
-    components.html("""
-    <script>
-    window.addEventListener('message', (event) => {
-        if (event.data === 'copied') {
-            const copiedBox = window.parent.document.querySelector("[data-testid='stMarkdownContainer']");
-            if (copiedBox && !document.getElementById('copied-msg')) {
-                const msg = document.createElement('div');
-                msg.id = 'copied-msg';
-                msg.innerText = '✔ Copied!';
-                msg.style.color = '#00ffcc';
-                msg.style.fontSize = '16px';
-                msg.style.marginTop = '6px';
-                msg.style.textAlign = 'center';
-                copiedBox.appendChild(msg);
-            }
-        }
-    });
-    </script>
-    """, height=0)
-
     st.session_state.quote_input = ""
