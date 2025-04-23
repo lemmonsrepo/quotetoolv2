@@ -62,10 +62,22 @@ if not st.session_state.submitted:
 
 # Handle keyboard input for desktop
 key_input = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
-if key_input == "Backspace" or key_input == "Delete":
+if key_input in ["Backspace", "Delete"]:
     reset_state()
-elif key_input.isdigit() and len(key_input) <= 2 and 18 <= int(key_input) <= 80:
-    st.session_state.age_input = key_input
+elif key_input.isdigit():
+    for digit in key_input:
+        if len(st.session_state.age_input) < 2:
+            if digit == "9" and st.session_state.age_input == "":
+                continue
+            if st.session_state.age_input == "1" and digit not in ["8", "9"]:
+                continue
+            if st.session_state.age_input == "8" and digit != "0":
+                continue
+            if st.session_state.age_input == "" and digit == "9":
+                continue
+            if len(st.session_state.age_input) == 1 and int(st.session_state.age_input + digit) > 80:
+                continue
+            st.session_state.age_input += digit
 
 def get_prices(age, gender):
     ia_prices = {
