@@ -5,17 +5,18 @@ st.set_page_config(page_title="", layout="centered")
 
 if "quote_input" not in st.session_state:
     st.session_state.quote_input = ""
-
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
-
 if "copy_text" not in st.session_state:
     st.session_state.copy_text = ""
+if "copied" not in st.session_state:
+    st.session_state.copied = False
 
 def reset_state():
     st.session_state.quote_input = ""
     st.session_state.submitted = False
     st.session_state.copy_text = ""
+    st.session_state.copied = False
 
 placeholder = st.empty()
 
@@ -23,6 +24,7 @@ if st.button("RESET"):
     reset_state()
 
 quote_input = placeholder.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3, disabled=True)
+
 st.markdown("""
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -92,7 +94,7 @@ if st.session_state.quote_input and len(st.session_state.quote_input) == 3 and s
     if plan == "FE":
         copy_block = f"({age}{g_abbr})\nFE ${price}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`); this.innerHTML += '<br><span style=\"color: #00ffcc; font-size: 14px;\">Copied!</span>';" 
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`); window.parent.postMessage('copied', '*');" 
              style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>FE ${price}</b>
@@ -102,7 +104,7 @@ if st.session_state.quote_input and len(st.session_state.quote_input) == 3 and s
         bundle = price + sh
         copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`); this.innerHTML += '<br><span style=\"color: #00ffcc; font-size: 14px;\">Copied!</span>';" 
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`); window.parent.postMessage('copied', '*');" 
              style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>{plan}${price}</b> | <b>SH${sh}</b><br>
@@ -112,3 +114,24 @@ if st.session_state.quote_input and len(st.session_state.quote_input) == 3 and s
 
     st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
+
+    copied_container = st.empty()
+    components.html("""
+    <script>
+    window.addEventListener('message', (event) => {
+        if (event.data === 'copied') {
+            const copiedBox = window.parent.document.querySelector("[data-testid='stMarkdownContainer']");
+            if (copiedBox && !document.getElementById('copied-msg')) {
+                const msg = document.createElement('div');
+                msg.id = 'copied-msg';
+                msg.innerText = '✔ Copied!';
+                msg.style.color = '#00ffcc';
+                msg.style.fontSize = '16px';
+                msg.style.marginTop = '6px';
+                msg.style.textAlign = 'center';
+                copiedBox.appendChild(msg);
+            }
+        }
+    });
+    </script>
+    """, height=0)
