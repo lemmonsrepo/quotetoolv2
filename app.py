@@ -57,11 +57,15 @@ def get_prices(age, gender):
 
 # Reset button
 if st.button("RESET"):
-    st.rerun()
+    st.experimental_rerun()
 
 # Input box
-quote_input = st.text_input("", max_chars=3, label_visibility="collapsed", key="quote_input_input")
+quote_input = st.text_input("", max_chars=3, label_visibility="collapsed").upper()
 
+# Clear previous results
+st.session_state["result_html"] = ""
+
+# Generate and display result
 if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["M", "F"]:
     age = int(quote_input[:2])
     gender = "Male" if quote_input[-1] == "M" else "Female"
@@ -88,5 +92,6 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
         <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
         """
 
-    st.text_input("", value="", label_visibility="collapsed")
+    # Display once
     components.html(html, height=180)
+    st.stop()
