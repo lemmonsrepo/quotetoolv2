@@ -60,27 +60,6 @@ if not st.session_state.submitted:
                     disable = True
                 cols[i].button(label, on_click=add_digit, args=(label,), disabled=disable, key=f"btn_{label}")
 
-# Keyboard input handling
-key_input = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
-if key_input == "" and st.session_state.submitted is False:
-    key_input = st.query_params.get("keyboard_input", [""])[0]
-if key_input in ["\b", "\x7f"]:
-    reset_state()
-elif key_input.isdigit():
-    for digit in key_input:
-        if len(st.session_state.age_input) < 2:
-            if digit == "9" and st.session_state.age_input == "":
-                continue
-            if st.session_state.age_input == "1" and digit not in ["8", "9"]:
-                continue
-            if st.session_state.age_input == "8" and digit != "0":
-                continue
-            if st.session_state.age_input == "" and digit == "9":
-                continue
-            if len(st.session_state.age_input) == 1 and int(st.session_state.age_input + digit) > 80:
-                continue
-            st.session_state.age_input += digit
-
 def get_prices(age, gender):
     ia_prices = {
         "Male": {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}},
@@ -121,7 +100,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
     if plan == "FE":
         copy_block = f"({age}{g_abbr})\nFE ${price}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; padding: 10px;'>
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>FE ${price}</b>
         </div>
@@ -130,10 +109,11 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         bundle = price + sh
         copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html_block = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; padding: 10px;'>
+        <div onclick="navigator.clipboard.writeText(`{copy_block}`)" style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
             ({age}{g_abbr})<br>
             <b>{plan}${price}</b> | <b>SH${sh}</b><br>
             <b>BUNDLE ${bundle}</b>
         </div>
         """
+    st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
