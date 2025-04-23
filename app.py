@@ -1,6 +1,5 @@
 import streamlit as st
 import platform
-import pyperclip
 
 st.set_page_config(page_title="", layout="centered")
 
@@ -74,11 +73,9 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
     age = int(st.session_state.age_input)
     gender = st.session_state.selected_gender
     result = ""
-    st.markdown(f"<div class='results' style='font-family: Myriad Pro; font-weight: bold; font-size: 22px; text-align: center;'>(" + str(age) + gender[0] + ")</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='results' style='font-family: Myriad Pro; font-weight: bold; font-size: 22px; text-align: center;'>({str(age)}{gender[0]})</div>", unsafe_allow_html=True)
     if age >= 65:
         fe_price = final_expense_prices[age][gender]
-        result = f"FE ${fe_price}"
-        st.session_state.copy_text = f"({age}{gender[0]})\nFE ${fe_price}"
         st.markdown(f"<div class='results' style='font-weight: bold;'>FE ${fe_price}</div>", unsafe_allow_html=True)
     else:
         if age <= 45:
@@ -89,10 +86,5 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
             price = male_tl_prices[age] if gender == "Male" else female_tl_prices[age]
         sh = male_sh_prices[age] if gender == "Male" else female_sh_prices[age]
         bundle = price + sh
-        line1 = f"{plan}${price} | SH${sh}"
-        line2 = f"BUNDLE ${bundle}"
-        st.session_state.copy_text = f"({age}{gender[0]})\n{line1}\n{line2}"
-        st.markdown(f"<div class='results' style='font-weight: bold;'>{line1}</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='results' style='font-weight: bold;'>{line2}</div>", unsafe_allow_html=True)
-
-    st.button("COPY", on_click=lambda: pyperclip.copy(st.session_state.copy_text))
+        st.markdown(f"<div class='results' style='font-weight: bold;'>{plan}${price} | SH${sh}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='results' style='font-weight: bold;'>BUNDLE ${bundle}</div>", unsafe_allow_html=True)
