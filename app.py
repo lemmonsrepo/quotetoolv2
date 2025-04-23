@@ -15,9 +15,9 @@ st.markdown("""
         justify-items: center;
         align-items: center;
         margin: 0 auto;
-        max-width: 300px;
+        max-width: 280px;
     }
-    .keypad-container button {
+    .keypad-button {
         width: 80px;
         height: 80px;
         font-size: 24px;
@@ -45,10 +45,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Detect if mobile
 is_mobile = platform.system() == "Linux" and "android" in platform.platform().lower()
 
-# State variables
 if "age_input" not in st.session_state:
     st.session_state.age_input = ""
 if "selected_gender" not in st.session_state:
@@ -56,7 +54,6 @@ if "selected_gender" not in st.session_state:
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 
-# Pricing data (same as before, unchanged)
 male_ia_prices = {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}}
 female_ia_prices = {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
 male_tl_prices = {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93}
@@ -65,7 +62,6 @@ male_sh_prices = {**{a: 9 for a in range(18, 41)}, **{41: 14, 42: 14, 43: 15, 44
 female_sh_prices = {18: 14, 19: 14, 20: 14, 21: 14, 22: 15, 23: 15, 24: 15, 25: 16, 26: 16, 27: 17, 28: 17, 29: 18, 30: 19, 31: 19, 32: 20, 33: 20, 34: 21, 35: 21, 36: 21, 37: 22, 38: 22, 39: 23, 40: 23, 41: 23, 42: 24, 43: 24, 44: 25, 45: 25, 46: 27, 47: 28, 48: 29, 49: 32, 50: 37, 51: 39, 52: 41, 53: 42, 54: 44, 55: 44, 56: 45, 57: 46, 58: 47, 59: 49, 60: 50, 61: 53, 62: 56, 63: 59, 64: 62}
 final_expense_prices = {age: {"Male": male, "Female": female} for age, male, female in [(65, 80, 64), (66, 85, 68), (67, 89, 72), (68, 94, 76), (69, 99, 80), (70, 103, 84), (71, 110, 89), (72, 116, 95), (73, 123, 101), (74, 129, 107), (75, 136, 112), (76, 144, 120), (77, 152, 128), (78, 160, 137), (79, 168, 145), (80, 176, 153)]}
 
-# Input display
 suffix = ""
 if st.session_state.selected_gender == "Male":
     suffix = " M"
@@ -73,7 +69,6 @@ elif st.session_state.selected_gender == "Female":
     suffix = " F"
 st.markdown(f'<div class="input-display">{st.session_state.age_input}{suffix}</div>', unsafe_allow_html=True)
 
-# Only show keypad if not submitted
 if not st.session_state.submitted:
     def add_digit(d):
         if len(st.session_state.age_input) < 2:
@@ -84,34 +79,32 @@ if not st.session_state.submitted:
         st.session_state.submitted = True
 
     st.markdown("<div class='keypad-container'>", unsafe_allow_html=True)
-    for digit in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
-        disabled = False
-        if st.session_state.age_input == "9" and digit != 0:
-            disabled = True
-        if st.session_state.age_input == "8" and digit != 0:
-            disabled = True
-        if st.session_state.age_input == "1" and digit not in [8, 9]:
-            disabled = True
-        if st.session_state.age_input and int(st.session_state.age_input + str(digit)) > 80:
-            disabled = True
-        if st.button(str(digit), key=f"btn{digit}", disabled=disabled):
-            add_digit(digit)
-
-    if st.button("MALE"):
-        select_gender("Male")
-    if st.button("0"):
-        add_digit(0)
-    if st.button("FEMALE"):
-        select_gender("Female")
+    for digit in [1, 2, 3, 4, 5, 6, 7, 8, 9, "MALE", 0, "FEMALE"]:
+        if isinstance(digit, int):
+            disabled = False
+            if st.session_state.age_input == "9" and digit != 0:
+                disabled = True
+            if st.session_state.age_input == "8" and digit != 0:
+                disabled = True
+            if st.session_state.age_input == "1" and digit not in [8, 9]:
+                disabled = True
+            if st.session_state.age_input and int(st.session_state.age_input + str(digit)) > 80:
+                disabled = True
+            if st.button(str(digit), key=f"btn{digit}", disabled=disabled):
+                add_digit(digit)
+        elif digit == "MALE":
+            if st.button("MALE", key="male_btn"):
+                select_gender("Male")
+        elif digit == "FEMALE":
+            if st.button("FEMALE", key="female_btn"):
+                select_gender("Female")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Reset button
 if st.button("RESET"):
     st.session_state.age_input = ""
     st.session_state.selected_gender = None
     st.session_state.submitted = False
 
-# Display result
 if st.session_state.submitted and st.session_state.age_input.isdigit():
     age = int(st.session_state.age_input)
     gender = st.session_state.selected_gender
