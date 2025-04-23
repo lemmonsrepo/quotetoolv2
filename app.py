@@ -64,38 +64,30 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
     if plan == "FE":
         copy_text = f"({age}{g_abbr})\nFE ${price}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);window.parent.postMessage('clear_input','*');document.getElementById('copied-msg').style.display='block';"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';document.getElementById('quote-input').value='';"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>FE ${price}</b>
         </div>
         <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
-        <script>
-            window.addEventListener("message", function(event) {
-                if (event.data === "clear_input") {
-                    const input = window.parent.document.querySelector("input[type=text]");
-                    if(input) input.value = "";
-                }
-            });
-        </script>
         """
     else:
         bundle = price + sh
         copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         html = f"""
-        <div onclick="navigator.clipboard.writeText(`{copy_text}`);window.parent.postMessage('clear_input','*');document.getElementById('copied-msg').style.display='block';"
+        <div onclick="navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied-msg').style.display='block';document.getElementById('quote-input').value='';"
              style='cursor:pointer;font-family:Myriad Pro;text-align:center;background:#2c2c2c;margin-top:3rem;padding:10px;border-radius:10px;font-size:22px;color:white;'>
             ({age}{g_abbr})<br><b>{plan}${price}</b> | <b>SH${sh}</b><br><b>BUNDLE ${bundle}</b>
         </div>
         <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
-        <script>
-            window.addEventListener("message", function(event) {
-                if (event.data === "clear_input") {
-                    const input = window.parent.document.querySelector("input[type=text]");
-                    if(input) input.value = "";
-                }
-            });
-        </script>
         """
 
-    components.html(html, height=230)
+    components.html(html, height=200)
     st.stop()
+
+# Assign an ID to the input for JS access
+st.markdown("""
+    <script>
+    const input = window.parent.document.querySelector("input[type='text']");
+    if (input) input.id = 'quote-input';
+    </script>
+""", unsafe_allow_html=True)
