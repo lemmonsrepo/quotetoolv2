@@ -60,12 +60,12 @@ if not st.session_state.submitted:
                     disable = True
                 cols[i].button(label, on_click=add_digit, args=(label,), disabled=disable, key=f"btn_{label}")
 
-    key = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
-    if key:
-        if key in ["Backspace", "Delete"]:
-            reset_state()
-        elif key.isdigit() and len(key) <= 2 and 18 <= int(key) <= 80:
-            st.session_state.age_input = key
+# Handle keyboard input for desktop
+key_input = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
+if key_input == "Backspace" or key_input == "Delete":
+    reset_state()
+elif key_input.isdigit() and len(key_input) <= 2 and 18 <= int(key_input) <= 80:
+    st.session_state.age_input = key_input
 
 def get_prices(age, gender):
     ia_prices = {
