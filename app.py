@@ -1,13 +1,7 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import platform
 
 st.set_page_config(page_title="", layout="centered")
-
-# Reset state
-if st.button("RESET"):
-    st.session_state.clear()
-    st.experimental_rerun()
 
 if "age_input" not in st.session_state:
     st.session_state.age_input = ""
@@ -16,92 +10,20 @@ if "selected_gender" not in st.session_state:
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 
-# JavaScript to manage input and button disabling
-age_val = st.session_state.age_input
-submitted = st.session_state.submitted
+if st.button("RESET"):
+    st.session_state.age_input = ""
+    st.session_state.selected_gender = None
+    st.session_state.submitted = False
 
 suffix = ""
 if st.session_state.selected_gender == "Male":
     suffix = " M"
 elif st.session_state.selected_gender == "Female":
     suffix = " F"
+
 st.markdown(f'<div style="font-family: Myriad Pro; font-weight: bold; font-size: 32px; color: white; text-align: center; border: 1px solid #ccc; padding: 10px; width: 220px; margin: 20px auto;">{st.session_state.age_input}{suffix}</div>', unsafe_allow_html=True)
 
-if not submitted:
-    components.html(f'''
-    <div id="grid-wrap" style="display: grid; grid-template-columns: repeat(3, 80px); gap: 12px; justify-content: center;">
-      <button class="key" id="b1" onclick="send('1')">1</button>
-      <button class="key" id="b2" onclick="send('2')">2</button>
-      <button class="key" id="b3" onclick="send('3')">3</button>
-      <button class="key" id="b4" onclick="send('4')">4</button>
-      <button class="key" id="b5" onclick="send('5')">5</button>
-      <button class="key" id="b6" onclick="send('6')">6</button>
-      <button class="key" id="b7" onclick="send('7')">7</button>
-      <button class="key" id="b8" onclick="send('8')">8</button>
-      <button class="key" id="b9" onclick="send('9')">9</button>
-      <button class="key male" id="m" onclick="send('M')">M</button>
-      <button class="key" id="b0" onclick="send('0')">0</button>
-      <button class="key female" id="f" onclick="send('F')">F</button>
-    </div>
-    <script>
-      const age = "{age_val}";
-      const submitted = {str(submitted).lower()};
-      if (!submitted) {{
-        let disabled = [];
-        if (age === "") {{}}
-        else if (age === "1") {{ disabled = ['b0','b1','b2','b3','b4','b5','b6','b7']; }}
-        else if (age === "8") {{ disabled = ['b1','b2','b3','b4','b5','b6','b7','b8','b9']; }}
-        else if (age.length === 2) {{
-          if (parseInt(age) < 17 || parseInt(age) > 80) {{
-            disabled = ['b0','b1','b2','b3','b4','b5','b6','b7','b8','b9','m','f'];
-          }} else {{
-            // enable M and F
-          }}
-        }} else {{ disabled = ['m','f']; }}
-        disabled.forEach(id => {{
-          let el = document.getElementById(id);
-          if (el) {{
-            el.disabled = true;
-            el.style.backgroundColor = '#222';
-          }}
-        }});
-      }}
-      function send(val) {{
-        const currentUrl = window.location.href.split("?")[0];
-        window.location.href = `${{currentUrl}}?input=${{val}}`;
-      }}
-    </script>
-    <style>
-      .key {{
-        width: 80px;
-        height: 80px;
-        font-size: 24px;
-        font-weight: bold;
-        font-family: 'Myriad Pro', sans-serif;
-        border: none;
-        background-color: #333;
-        color: #fff;
-        border-radius: 6px;
-        transition: background-color 0.2s;
-      }}
-      .key:hover {{ background-color: #444; }}
-      .key:active {{ background-color: #666; }}
-      .male {{ background-color: #007bff; }}
-      .female {{ background-color: #e91e63; }}
-    </style>
-    ''', height=500)
-
-# Accept and process input
-query_params = st.query_params
-if "input" in query_params:
-    val = query_params["input"][0]
-    if val in ["M", "F"] and len(st.session_state.age_input) == 2:
-        st.session_state.selected_gender = "Male" if val == "M" else "Female"
-        st.session_state.submitted = True
-    elif val.isdigit() and len(st.session_state.age_input) < 2:
-        st.session_state.age_input += val
-
-# Pricing logic
+# Pricing dictionaries
 male_ia_prices = {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}}
 female_ia_prices = {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
 male_tl_prices = {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93}
@@ -110,7 +32,41 @@ male_sh_prices = {**{a: 9 for a in range(18, 41)}, **{41: 14, 42: 14, 43: 15, 44
 female_sh_prices = {18: 14, 19: 14, 20: 14, 21: 14, 22: 15, 23: 15, 24: 15, 25: 16, 26: 16, 27: 17, 28: 17, 29: 18, 30: 19, 31: 19, 32: 20, 33: 20, 34: 21, 35: 21, 36: 21, 37: 22, 38: 22, 39: 23, 40: 23, 41: 23, 42: 24, 43: 24, 44: 25, 45: 25, 46: 27, 47: 28, 48: 29, 49: 32, 50: 37, 51: 39, 52: 41, 53: 42, 54: 44, 55: 44, 56: 45, 57: 46, 58: 47, 59: 49, 60: 50, 61: 53, 62: 56, 63: 59, 64: 62}
 final_expense_prices = {age: {"Male": m, "Female": f} for age, m, f in [(65, 80, 64), (66, 85, 68), (67, 89, 72), (68, 94, 76), (69, 99, 80), (70, 103, 84), (71, 110, 89), (72, 116, 95), (73, 123, 101), (74, 129, 107), (75, 136, 112), (76, 144, 120), (77, 152, 128), (78, 160, 137), (79, 168, 145), (80, 176, 153)]}
 
-# Output
+if not st.session_state.submitted:
+    def add_digit(d):
+        if len(st.session_state.age_input) < 2:
+            st.session_state.age_input += d
+
+    def disable_key(key):
+        st.button(key, disabled=True)
+
+    rows = [["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]
+
+    for row in rows:
+        cols = st.columns(3)
+        for i, key in enumerate(row):
+            disable = False
+            if st.session_state.age_input == "1" and key not in ["8", "9"]:
+                disable = True
+            if st.session_state.age_input == "8" and key != "0":
+                disable = True
+            if st.session_state.age_input and len(st.session_state.age_input) == 1 and int(st.session_state.age_input + key) > 80:
+                disable = True
+            with cols[i]:
+                st.button(key, on_click=add_digit, args=(key,), disabled=disable, key=f"btn{key}")
+
+    cols = st.columns(3)
+    with cols[0]:
+        st.button("MALE", on_click=lambda: submit("Male"), disabled=len(st.session_state.age_input) != 2, key="male")
+    with cols[1]:
+        st.button("0", on_click=add_digit, args=("0",), disabled=st.session_state.age_input not in ["8"], key="btn0")
+    with cols[2]:
+        st.button("FEMALE", on_click=lambda: submit("Female"), disabled=len(st.session_state.age_input) != 2, key="female")
+
+def submit(gender):
+    st.session_state.selected_gender = gender
+    st.session_state.submitted = True
+
 if st.session_state.submitted and st.session_state.age_input.isdigit():
     age = int(st.session_state.age_input)
     gender = st.session_state.selected_gender
