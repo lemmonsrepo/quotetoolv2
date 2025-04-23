@@ -117,20 +117,18 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
     plan, price, sh = get_prices(age, gender)
 
     if plan == "FE":
-        output = f"({age}{g_abbr})\nFE ${price}"
+        output = f"({age}{g_abbr})\n<b>FE ${price}</b>"
     else:
         bundle = price + sh
-        output = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
+        output = f"({age}{g_abbr})\n<b>{plan}${price}</b> | <b>SH${sh}</b>\n<b>BUNDLE ${bundle}</b>"
 
     st.session_state.copy_text = output
 
-    # Modified HTML for copy box with proper formatting and bold keywords only
     html_block = f"""
         <style>
             .copy-box {{
                 cursor: pointer;
                 font-family: Myriad Pro;
-                font-weight: 400;
                 font-size: 22px;
                 text-align: center;
                 color: white;
@@ -156,8 +154,8 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
             }}
             @keyframes fadeout {{ from {{ opacity: 1; }} to {{ opacity: 0; }} }}
         </style>
-        <div class="copy-box" onclick="navigator.clipboard.writeText(`{output}`); var popup=document.createElement('div'); popup.className='copied-popup'; popup.innerText='Copied!'; document.body.appendChild(popup); setTimeout(function(){{popup.remove()}}, 2000);">
-            {output.replace("IA$", "<b>IA$").replace("TL$", "<b>TL$").replace("SH$", "<b>SH$").replace("BUNDLE $", "<b>BUNDLE $").replace("\n", "</b><br>")}
+        <div class="copy-box" onclick="navigator.clipboard.writeText(`{st.session_state.copy_text}`); var popup=document.createElement('div'); popup.className='copied-popup'; popup.innerText='Copied!'; document.body.appendChild(popup); setTimeout(function(){{popup.remove()}}, 2000);">
+            {output.replace(chr(10), "<br>")}
         </div>
     """
     components.html(html_block, height=180)
