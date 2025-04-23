@@ -138,4 +138,4 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         """
     st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
-    st.text_input("", value=copy_block, label_visibility="collapsed")
+    st.text_area("", value=copy_block, label_visibility="collapsed")
