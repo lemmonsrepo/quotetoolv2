@@ -18,12 +18,23 @@ def reset_state():
     st.session_state.copy_text = ""
     st.session_state.copied = False
 
+st.markdown("""
+<style>
+    input[type="text"] {
+        opacity: 0;
+        height: 1px;
+        position: absolute;
+        top: -100px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 placeholder = st.empty()
 
 if st.button("RESET"):
     reset_state()
 
-quote_input = placeholder.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3, disabled=True)
+quote_input = placeholder.text_input("", value=st.session_state.quote_input, label_visibility="collapsed", max_chars=3)
 
 st.markdown("""
 <script>
@@ -115,7 +126,6 @@ if st.session_state.quote_input and len(st.session_state.quote_input) == 3 and s
     st.session_state.copy_text = copy_block
     st.markdown(html_block, unsafe_allow_html=True)
 
-    copied_container = st.empty()
     components.html("""
     <script>
     window.addEventListener('message', (event) => {
