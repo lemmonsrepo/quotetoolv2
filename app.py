@@ -8,15 +8,16 @@ st.markdown("""
     <style>
     header {visibility: hidden;}
     .stApp { padding-top: 0rem; }
-    .keypad-grid {
+    .keypad-container {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
         justify-items: center;
+        align-items: center;
         margin: 0 auto;
         max-width: 300px;
     }
-    .key-button {
+    .keypad-container button {
         width: 80px;
         height: 80px;
         font-size: 24px;
@@ -82,7 +83,7 @@ if not st.session_state.submitted:
         st.session_state.selected_gender = g
         st.session_state.submitted = True
 
-    st.markdown("<div class='keypad-grid'>", unsafe_allow_html=True)
+    st.markdown("<div class='keypad-container'>", unsafe_allow_html=True)
     for digit in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
         disabled = False
         if st.session_state.age_input == "9" and digit != 0:
@@ -96,13 +97,11 @@ if not st.session_state.submitted:
         if st.button(str(digit), key=f"btn{digit}", disabled=disabled):
             add_digit(digit)
 
-    # Last row: male, 0, female
-    col_male, col_zero, col_female = st.columns([1, 1, 1])
-    if col_male.button("MALE"):
+    if st.button("MALE"):
         select_gender("Male")
-    if col_zero.button("0"):
+    if st.button("0"):
         add_digit(0)
-    if col_female.button("FEMALE"):
+    if st.button("FEMALE"):
         select_gender("Female")
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -131,3 +130,4 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         st.markdown(f"<div class='results'>{plan}${tl_price}</div>", unsafe_allow_html=True)
         st.markdown(f"<div class='results'>SH${sh_price}</div>", unsafe_allow_html=True)
         st.markdown(f"<div class='results'>BUNDLE${bundle}</div>", unsafe_allow_html=True)
+
