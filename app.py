@@ -125,7 +125,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         }}
         @keyframes fadeout {{ from {{ opacity: 1; }} to {{ opacity: 0; }} }}
         </style>
-        <div class="copy-box" onclick="navigator.clipboard.writeText(`{output}`); let popup=document.createElement('div'); popup.className='copied-popup'; popup.innerText='Copied!'; document.body.appendChild(popup); setTimeout(() => popup.remove(), 2000);">
+        <div class="copy-box" onclick="navigator.clipboard.writeText(`{output.replace('\\n', ' ')}`); let popup=document.createElement('div'); popup.className='copied-popup'; popup.innerText='Copied!'; document.body.appendChild(popup); setTimeout(() => popup.remove(), 2000);">
             {output.replace('\n', '<br>')}
         </div>
     """, unsafe_allow_html=True)
