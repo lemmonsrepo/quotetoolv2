@@ -3,41 +3,23 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="", layout="centered")
 
-# Initialize session state
-if "quote_input" not in st.session_state:
-    st.session_state["quote_input"] = ""
+# State management
 if "copied" not in st.session_state:
-    st.session_state["copied"] = False
+    st.session_state.copied = False
 
-def reset_state():
-    st.session_state["quote_input"] = ""
-    st.session_state["copied"] = False
-
-st.markdown("""
-<style>
-input[type="text"] {
-  font-size: 24px;
-  text-align: center;
-  font-family: Myriad Pro;
-  letter-spacing: 1px;
-  color: white;
-}
-</style>
-""", unsafe_allow_html=True)
-
-input_box = st.text_input("", label_visibility="collapsed", max_chars=3, key="quote_input")
-input_box = input_box.upper()
-st.session_state.quote_input = input_box
-
-# Reset button
+# Function to reset
 if st.button("RESET"):
-    reset_state()
+    st.experimental_rerun()
 
-# Determine if valid input and parse
-if len(input_box) == 3 and input_box[:2].isdigit() and input_box[-1] in ["M", "F"] and input_box[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-    age = int(input_box[:2])
-    gender = "Male" if input_box[-1] == "M" else "Female"
-    g_abbr = input_box[-1]
+# Input field setup
+quote_input = st.text_input("", label_visibility="collapsed", max_chars=3, key="input_box")
+quote_input = quote_input.upper()
+
+# Parse input if valid (must be 2 digits + M/F)
+if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+    age = int(quote_input[:2])
+    gender = "Male" if quote_input[-1] == "M" else "Female"
+    g_abbr = quote_input[-1]
 
     def get_prices(age, gender):
         ia_prices = {
@@ -73,23 +55,24 @@ if len(input_box) == 3 and input_box[:2].isdigit() and input_box[-1] in ["M", "F
     plan, price, sh = get_prices(age, gender)
 
     if plan == "FE":
-        copy_block = f"({age}{g_abbr})\nFE ${price}"
-        html_block = f"""
-        <div style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;' onclick="navigator.clipboard.writeText(`{copy_block}`); alert('✔ Copied!')">
-            ({age}{g_abbr})<br>
-            <b>FE ${price}</b>
+        copy_text = f"({age}{g_abbr})\nFE ${price}"
+        html = f"""
+        <div onclick=\"navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied').style.display='block'\"
+             style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+            ({age}{g_abbr})<br><b>FE ${price}</b>
         </div>
+        <div id='copied' style='display:none; text-align:center; color: lightgreen;'>✔ Copied!</div>
         """
     else:
         bundle = price + sh
-        copy_block = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
-        html_block = f"""
-        <div style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;' onclick="navigator.clipboard.writeText(`{copy_block}`); alert('✔ Copied!')">
-            ({age}{g_abbr})<br>
-            <b>{plan}${price}</b> | <b>SH${sh}</b><br>
-            <b>BUNDLE ${bundle}</b>
+        copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
+        html = f"""
+        <div onclick=\"navigator.clipboard.writeText(`{copy_text}`);document.getElementById('copied').style.display='block'\"
+             style='cursor: pointer; font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6; background-color: #2c2c2c; padding: 10px; border-radius: 8px;'>
+            ({age}{g_abbr})<br><b>{plan}${price}</b> | <b>SH${sh}</b><br><b>BUNDLE ${bundle}</b>
         </div>
+        <div id='copied' style='display:none; text-align:center; color: lightgreen;'>✔ Copied!</div>
         """
 
-    st.markdown(html_block, unsafe_allow_html=True)
-    st.session_state.quote_input = ""
+    components.html(html, height=140)
+    st.experimental_rerun()
