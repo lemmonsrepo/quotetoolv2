@@ -28,7 +28,7 @@ if st.button("RESET"):
     st.session_state.copy_text = ""
 
 # Pricing data (same as before)
-...  # omitted here for brevity but unchanged from your current version
+# (You’ll re-insert the pricing dictionaries here)
 
 # Results block
 if st.session_state.submitted and st.session_state.age_input.isdigit():
@@ -40,8 +40,10 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
         <style>
         .results { font-family: Myriad Pro; font-size: 22px; text-align: center; }
         .bold { font-weight: bold; }
-        .copy-button-container { text-align: center; margin-top: 10px; }
+        .copy-button-container { text-align: center; margin-top: 20px; }
         .copy-button { font-size: 16px; padding: 8px 20px; margin-top: 5px; border-radius: 6px; background-color: #444; color: white; border: none; cursor: pointer; }
+        .copied-popup { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #1f1; color: black; font-weight: bold; padding: 8px 16px; border-radius: 8px; z-index: 1000; animation: fadeout 2s ease-out forwards; }
+        @keyframes fadeout { from { opacity: 1; } to { opacity: 0; } }
         </style>
     """, unsafe_allow_html=True)
 
@@ -61,7 +63,7 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
             price = male_tl_prices[age] if gender == "Male" else female_tl_prices[age]
         sh = male_sh_prices[age] if gender == "Male" else female_sh_prices[age]
         bundle = price + sh
-        line1 = f"<span class='bold'>{plan}${price}</span> | <span class='bold'>SH${sh}</span>"
+        line1 = f"<span class='bold'>{plan}${price}</span> <span style='font-weight: normal;'>|</span> <span class='bold'>SH${sh}</span>"
         line2 = f"<span class='bold'>BUNDLE ${bundle}</span>"
         st.session_state.copy_text = f"({age}{g_abbr})\n{plan}${price} | SH${sh}\nBUNDLE ${bundle}"
         st.markdown(f"<div class='results'>{line1}</div>", unsafe_allow_html=True)
@@ -70,10 +72,10 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
     # Proper copy button using JS
     st.markdown(f"""
         <div class='copy-button-container'>
-        <textarea id="copyText" style="opacity: 0; height: 1px;">{st.session_state.copy_text}</textarea>
-        <button class='copy-button' onclick="navigator.clipboard.writeText(document.getElementById('copyText').value); let msg = document.createElement('div'); msg.innerText = 'Copied!'; msg.style.color = '#0f0'; document.body.appendChild(msg); setTimeout(()=>msg.remove(), 1500);">COPY</button>
+            <textarea id="copyText" style="opacity: 0; height: 1px;">{st.session_state.copy_text}</textarea>
+            <button class='copy-button' onclick="navigator.clipboard.writeText(document.getElementById('copyText').value); let m = document.createElement('div'); m.className = 'copied-popup'; m.innerText = 'Copied!'; document.body.appendChild(m); setTimeout(() => m.remove(), 2000);">COPY</button>
         </div>
     """, unsafe_allow_html=True)
 
 # Input flow (unchanged)
-...  # remains the same
+# (You’ll re-insert the button layout logic here)
