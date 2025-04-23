@@ -55,10 +55,6 @@ def get_prices(age, gender):
     else:
         return "TL", tl_prices[gender][age], sh_prices[gender][age]
 
-# Reset button
-if st.button("RESET"):
-    st.experimental_rerun()
-
 # Input box
 quote_input = st.text_input("", max_chars=3, label_visibility="collapsed").upper()
 
@@ -92,6 +88,9 @@ if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["
         <div id='copied-msg' style='display:none;text-align:center;color:lightgreen;font-size:16px;'>✔ Copied!</div>
         """
 
-    # Display once
+    # Clear the input field
+    st.session_state["quote_input"] = ""
+
+    # Display the result
     components.html(html, height=180)
     st.stop()
