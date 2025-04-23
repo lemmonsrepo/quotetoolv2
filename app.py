@@ -60,7 +60,7 @@ if not st.session_state.submitted:
                     disable = True
                 cols[i].button(label, on_click=add_digit, args=(label,), disabled=disable, key=f"btn_{label}")
 
-# Handle keyboard input for desktop
+# Keyboard input handling
 key_input = st.text_input("", value="", max_chars=2, key="keyboard_input", label_visibility="collapsed")
 if key_input in ["Backspace", "Delete"]:
     reset_state()
@@ -81,8 +81,8 @@ elif key_input.isdigit():
 
 def get_prices(age, gender):
     ia_prices = {
-        "Male": {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}, **{a: 0 for a in range(46, 65)}},
-        "Female": {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}, **{a: 0 for a in range(46, 65)}}
+        "Male": {**{a: 21 for a in range(18, 41)}, **{a: 25 for a in range(41, 46)}},
+        "Female": {**{a: 20 for a in range(18, 41)}, **{a: 22 for a in range(41, 46)}}
     }
     tl_prices = {
         "Male": {46: 25, 47: 27, 48: 28, 49: 30, 50: 31, 51: 33, 52: 35, 53: 37, 54: 39, 55: 41, 56: 45, 57: 49, 58: 53, 59: 58, 60: 62, 61: 70, 62: 77, 63: 84, 64: 93},
@@ -117,45 +117,19 @@ if st.session_state.submitted and st.session_state.age_input.isdigit():
     plan, price, sh = get_prices(age, gender)
 
     if plan == "FE":
-        output = f"({age}{g_abbr})\n<b>FE ${price}</b>"
+        html_block = f"""
+        <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
+            ({age}{g_abbr})<br>
+            <span style='font-weight:bold;'>FE ${price}</span>
+        </div>
+        """
     else:
         bundle = price + sh
-        output = f"({age}{g_abbr})\n<b>{plan}${price}</b> | <b>SH${sh}</b>\n<b>BUNDLE ${bundle}</b>"
-
-    st.session_state.copy_text = output
-
-    html_block = f"""
-        <style>
-            .copy-box {{
-                cursor: pointer;
-                font-family: Myriad Pro;
-                font-size: 22px;
-                text-align: center;
-                color: white;
-                padding: 15px;
-                border: 1px solid #555;
-                border-radius: 8px;
-                background-color: #222;
-                margin-top: 20px;
-                line-height: 1.6;
-            }}
-            .copied-popup {{
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: #1f1;
-                color: black;
-                font-weight: bold;
-                padding: 8px 16px;
-                border-radius: 8px;
-                z-index: 1000;
-                animation: fadeout 2s ease-out forwards;
-            }}
-            @keyframes fadeout {{ from {{ opacity: 1; }} to {{ opacity: 0; }} }}
-        </style>
-        <div class="copy-box" onclick="navigator.clipboard.writeText(`{st.session_state.copy_text}`); var popup=document.createElement('div'); popup.className='copied-popup'; popup.innerText='Copied!'; document.body.appendChild(popup); setTimeout(function(){{popup.remove()}}, 2000);">
-            {output.replace(chr(10), "<br>")}
+        html_block = f"""
+        <div style='font-family: Myriad Pro; color: white; font-size: 22px; text-align: center; line-height: 1.6;'>
+            ({age}{g_abbr})<br>
+            <span style='font-weight:bold;'>{plan}${price}</span> | <span style='font-weight:bold;'>SH${sh}</span><br>
+            <span style='font-weight:bold;'>BUNDLE ${bundle}</span>
         </div>
-    """
-    components.html(html_block, height=180)
+        """
+    st.markdown(html_block, unsafe_allow_html=True)
