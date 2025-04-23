@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="", layout="centered")
 
 if "quote_input" not in st.session_state:
-    st.session_state.quote_input = ""
+    st.session_state["quote_input_box"] = ""
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 if "copy_text" not in st.session_state:
@@ -29,7 +29,7 @@ input[type="text"] {
 </style>
 """, unsafe_allow_html=True)
 
-quote_input = st.text_input("", label_visibility="collapsed", max_chars=3)
+quote_input = st.text_input("", label_visibility="collapsed", max_chars=3, key="quote_input_box")
 quote_input = quote_input.upper()
 if len(quote_input) == 3 and quote_input[:2].isdigit() and quote_input[-1] in ["M", "F"] and quote_input[0] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
     st.session_state.quote_input = quote_input
